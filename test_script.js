@@ -15,19 +15,25 @@ client.connect((err) => {
   if (err) {
     return console.error("Connection Error", err);
   }
-  findName(name);
+  findName(name, (result) => {
+    findNameOutput(result);
+  });
 });
 
-let findName = (name) => {
+let findName = (name, cb) => {
   client.query("SELECT * FROM famous_people WHERE first_name = $1::text OR last_name = $1::text", name,(err, result) => {
     if (err) {
       return console.error("error running query", err);
     }
-    console.log('Searching...');
-    console.log(`Found ${result.rows.length} person(s) by the name '${name}'`);
-    console.log(`-${result.rows[0].id}: ${result.rows[0].first_name} ${result.rows[0].last_name}, born '${result.rows[0].birthdate}'`); //output: 1
+    cb(result);
     client.end();
   });
+};
+
+let findNameOutput = (result) => {
+  console.log('Searching...');
+  console.log(`Found ${result.rows.length} person(s) by the name '${name}'`);
+  console.log(`-${result.rows[0].id}: ${result.rows[0].first_name} ${result.rows[0].last_name}, born '${result.rows[0].birthdate}'`); //output: 1
 };
 
   // client.query("SELECT $1::int AS number", ["1"], (err, result) => {
